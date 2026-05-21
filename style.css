@@ -34,7 +34,11 @@
 /* ── Reset ──────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { scroll-behavior: smooth; }
+/* Lenis overrides native scroll-behaviour */
+html { scroll-behavior: auto; }
+html.lenis { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
 
 body {
   font-family: var(--ff-serif);
@@ -82,6 +86,18 @@ button { cursor: pointer; font: inherit; border: none; background: none; }
 .chip-light {
   border-color: var(--rule-dark);
   color: rgba(240,232,213,0.45);
+}
+
+/* ── Scroll progress bar ────────────────────────────────────── */
+.scroll-progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  width: 0%;
+  background: linear-gradient(to right, var(--gold), var(--gold-hi));
+  z-index: 9998;
+  pointer-events: none;
+  transform-origin: left;
 }
 
 /* ── Generic reveal initial states (JS animates to visible) ── */
@@ -460,6 +476,43 @@ body.cursor-light.cursor-hover #cursor-ring { border-color: rgba(13,15,11,0.8); 
   100% { transform: translateX(-50%); }
 }
 
+/* ── Running Line ───────────────────────────────────────────── */
+.runline {
+  background: var(--black);
+  overflow: hidden;
+  padding: 3.5rem 0;
+  border-top: 1px solid var(--rule-dark);
+  border-bottom: 1px solid var(--rule-dark);
+}
+.runline-track {
+  display: flex;
+  align-items: baseline;
+  gap: 3rem;
+  white-space: nowrap;
+  animation: runlineScroll 65s linear infinite;
+  will-change: transform;
+  padding-left: 3rem;
+}
+.runline-item {
+  font-family: var(--ff-display);
+  font-size: clamp(1.5rem, 2.8vw, 3rem);
+  font-weight: 400;
+  color: rgba(240,232,213,0.6);
+  line-height: 1;
+}
+.runline-item.italic { font-style: italic; color: rgba(240,232,213,0.45); }
+.runline-mark {
+  font-family: var(--ff-mono);
+  font-size: 1rem;
+  color: var(--gold);
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+@keyframes runlineScroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
 /* ── Manifesto ──────────────────────────────────────────────── */
 .manifesto {
   padding: clamp(5rem, 10vw, 10rem) 0;
@@ -467,8 +520,7 @@ body.cursor-light.cursor-hover #cursor-ring { border-color: rgba(13,15,11,0.8); 
   overflow: hidden;
   position: relative;
 }
-.manifesto::before {
-  content: '90';
+.manifesto-watermark {
   position: absolute;
   right: -0.04em;
   top: 50%;
@@ -483,6 +535,7 @@ body.cursor-light.cursor-hover #cursor-ring { border-color: rgba(13,15,11,0.8); 
   z-index: 0;
   user-select: none;
   letter-spacing: -0.04em;
+  will-change: transform;
 }
 .manifesto-inner {
   max-width: var(--container);
@@ -623,8 +676,14 @@ body.cursor-light.cursor-hover #cursor-ring { border-color: rgba(13,15,11,0.8); 
 .deposit-slip {
   background: var(--white);
   border: 1px solid var(--rule-light);
-  box-shadow: 0 8px 60px rgba(13,15,11,0.08);
+  box-shadow: 0 8px 60px rgba(13,15,11,0.08), 0 2px 12px rgba(13,15,11,0.04);
   position: relative;
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition: box-shadow 0.4s var(--ease);
+}
+.deposit-slip:hover {
+  box-shadow: 0 24px 80px rgba(13,15,11,0.14), 0 4px 20px rgba(13,15,11,0.06);
 }
 .slip-head {
   background: var(--green-deep);
@@ -748,6 +807,12 @@ body.cursor-light.cursor-hover #cursor-ring { border-color: rgba(13,15,11,0.8); 
   font-size: 0.95rem;
   color: var(--ink-mid);
   line-height: 1.5;
+  transition: color 0.2s, padding-left 0.3s var(--ease);
+  cursor: default;
+}
+.topic-row:hover {
+  color: var(--ink);
+  padding-left: 0.5rem;
 }
 .topic-row:first-child { border-top: 1px solid var(--rule-light); }
 .topic-dash { color: var(--ink-light); flex-shrink: 0; }
@@ -936,7 +1001,21 @@ body.cursor-light.cursor-hover #cursor-ring { border-color: rgba(13,15,11,0.8); 
   padding: 1.75rem 0;
   border-bottom: 1px solid var(--rule-light);
   align-items: baseline;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+  transition: border-color 0.3s;
 }
+.art-item::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 0; height: 1.5px;
+  background: var(--gold);
+  transition: width 0.45s var(--ease);
+}
+.art-item:hover::before { width: 100%; }
+.art-item:hover .art-num { color: var(--gold-hi); transition: color 0.2s; }
 .art-num {
   font-size: 0.62rem;
   letter-spacing: 0.14em;
@@ -995,6 +1074,19 @@ body.cursor-light.cursor-hover #cursor-ring { border-color: rgba(13,15,11,0.8); 
   gap: 0.35rem;
   padding: 1.4rem 0;
   border-bottom: 1px solid var(--rule-dark);
+  transition: padding-left 0.3s var(--ease);
+  cursor: default;
+}
+.branch-eg:hover {
+  padding-left: 0.75rem;
+}
+.branch-eg:hover .branch-type {
+  color: var(--gold);
+  transition: color 0.2s;
+}
+.branch-eg:hover .branch-session {
+  color: var(--cream);
+  transition: color 0.2s;
 }
 .branch-type {
   font-size: 0.62rem;
@@ -1300,6 +1392,9 @@ body.cursor-light.cursor-hover #cursor-ring { border-color: rgba(13,15,11,0.8); 
   }
   .manifesto-p { clip-path: inset(0 0% 0 0) !important; }
   .hl { transform: translateY(0) !important; }
+  .hiw-heading, .branches-heading, .oa-heading, .art-top h2, .ledger-top h2 {
+    clip-path: inset(0 0% 0 0) !important;
+  }
   .hero-eyebrow { opacity: 1 !important; }
   .hero-foot { opacity: 1 !important; transform: none !important; }
   .meta-before { color: rgba(240,232,213,0.25) !important; }
@@ -1349,6 +1444,9 @@ body.cursor-light.cursor-hover #cursor-ring { border-color: rgba(13,15,11,0.8); 
 }
 
 @media (max-width: 680px) {
+  .hero {
+    background: radial-gradient(ellipse 120% 70% at 40% 35%, #1d4a38, #0c1c14 70%);
+  }
   .hero-headline { font-size: clamp(2.2rem, 8.5vw, 3.8rem); }
   .hero-foot {
     flex-direction: column;
@@ -1394,4 +1492,5 @@ body.cursor-light.cursor-hover #cursor-ring { border-color: rgba(13,15,11,0.8); 
 
 @media (max-width: 480px) {
   .ticker-label { display: none; }
+  .runline-item { font-size: clamp(1.2rem, 5vw, 1.6rem); }
 }

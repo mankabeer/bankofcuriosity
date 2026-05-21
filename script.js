@@ -1,17 +1,49 @@
 /* ============================================================
    BANK OF CURIOSITY — JS
-   GSAP + ScrollTrigger + Canvas + Cursor + Interactions
+   Lenis + GSAP + ScrollTrigger + Canvas + Cursor + Interactions
    ============================================================ */
 
 gsap.registerPlugin(ScrollTrigger);
 
 /* ── Globals ────────────────────────────────────────────────── */
-const isMobile      = window.matchMedia('(max-width: 680px)').matches;
+const isMobile       = window.matchMedia('(max-width: 680px)').matches;
 const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/* ── Ticker duplication (double content for seamless -50% loop) */
+/* ── Lenis smooth scroll ────────────────────────────────────── */
+let lenis;
+function initLenis() {
+  if (prefersReduced || typeof Lenis === 'undefined') return;
+
+  lenis = new Lenis({
+    duration: 1.3,
+    easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    smoothTouch: false,
+  });
+
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add(time => lenis.raf(time * 1000));
+  gsap.ticker.lagSmoothing(0);
+
+  // Anchor links → Lenis scroll
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (!target) return;
+      e.preventDefault();
+      lenis.scrollTo(target, { offset: -68 });
+    });
+  });
+}
+
+/* ── Content doublers ───────────────────────────────────────── */
 (function initTicker() {
   const track = document.getElementById('tickerTrack');
+  if (!track) return;
+  track.innerHTML += track.innerHTML;
+})();
+
+(function initRunline() {
+  const track = document.getElementById('runlineTrack');
   if (!track) return;
   track.innerHTML += track.innerHTML;
 })();
@@ -21,7 +53,7 @@ function initCanvas() {
   const canvas = document.getElementById('hero-canvas');
   if (!canvas || isMobile) return;
   const ctx = canvas.getContext('2d');
-  let W, H, lines = [], raf, lastTime = 0;
+  let W, H, lines = [], lastTime = 0;
 
   function resize() {
     W = canvas.width  = canvas.offsetWidth;
@@ -44,9 +76,9 @@ function initCanvas() {
 
   let t = 0;
   function draw(now) {
-    const deltaTime = lastTime ? (now - lastTime) / 1000 : 0;
+    const delta = lastTime ? (now - lastTime) / 1000 : 0;
     lastTime = now;
-    t += deltaTime * 6000;
+    t += delta * 6000;
 
     ctx.clearRect(0, 0, W, H);
     lines.forEach(l => {
@@ -59,12 +91,12 @@ function initCanvas() {
       }
       ctx.stroke();
     });
-    raf = requestAnimationFrame(draw);
+    requestAnimationFrame(draw);
   }
 
   resize();
   window.addEventListener('resize', resize);
-  if (!prefersReduced) raf = requestAnimationFrame(draw);
+  if (!prefersReduced) requestAnimationFrame(draw);
 }
 
 /* ── Preloader ──────────────────────────────────────────────── */
@@ -105,19 +137,18 @@ function initHeroEntrance() {
   const lines   = document.querySelectorAll('.hero-headline .hl');
   const foot    = document.getElementById('heroFoot');
 
-  gsap.set(lines, { y: '108%' });
+  gsap.set(lines,  { y: '108%' });
   gsap.set([eyebrow, foot], { opacity: 0, y: 18 });
 
   const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
   tl.to(eyebrow, { opacity: 1, y: 0, duration: 0.7 })
     .to(lines,   { y: '0%', duration: 1.0, stagger: 0.08 }, '-=0.45')
-    .to(foot,    { opacity: 1, y: 0, duration: 0.7 },       '-=0.55');
+    .to(foot,    { opacity: 1, y: 0, duration: 0.7 }, '-=0.55');
 }
 
 /* ── Custom cursor ──────────────────────────────────────────── */
 function initCursor() {
   if (isMobile || !window.matchMedia('(hover:hover)').matches) return;
-
   const dot  = document.getElementById('cursor-dot');
   const ring = document.getElementById('cursor-ring');
   if (!dot || !ring) return;
@@ -143,8 +174,7 @@ function initCursor() {
   document.querySelectorAll('[data-section-theme="light"]').forEach(s => {
     ScrollTrigger.create({
       trigger: s,
-      start: 'top 10%',
-      end: 'bottom 10%',
+      start: 'top 10%', end: 'bottom 10%',
       onEnter:     () => document.body.classList.add('cursor-light'),
       onLeave:     () => document.body.classList.remove('cursor-light'),
       onEnterBack: () => document.body.classList.add('cursor-light'),
@@ -159,10 +189,8 @@ function initMagnets() {
   document.querySelectorAll('[data-magnet]').forEach(el => {
     el.addEventListener('mousemove', e => {
       const r  = el.getBoundingClientRect();
-      const cx = r.left + r.width  / 2;
-      const cy = r.top  + r.height / 2;
-      const dx = (e.clientX - cx) * 0.28;
-      const dy = (e.clientY - cy) * 0.28;
+      const dx = (e.clientX - (r.left + r.width  / 2)) * 0.28;
+      const dy = (e.clientY - (r.top  + r.height / 2)) * 0.28;
       gsap.to(el, { x: dx, y: dy, duration: 0.35, ease: 'power2.out' });
     });
     el.addEventListener('mouseleave', () => {
@@ -171,7 +199,32 @@ function initMagnets() {
   });
 }
 
-/* ── Nav: scroll state + burger ─────────────────────────────── */
+/* ── Deposit slip 3D tilt ───────────────────────────────────── */
+function initTilt() {
+  const slip = document.getElementById('depositSlip');
+  if (!slip || isMobile || prefersReduced) return;
+
+  slip.addEventListener('mousemove', e => {
+    const r  = slip.getBoundingClientRect();
+    const rx = ((e.clientY - (r.top  + r.height / 2)) / r.height) *  9;
+    const ry = ((e.clientX - (r.left + r.width  / 2)) / r.width)  * -9;
+    gsap.to(slip, {
+      rotationX: rx, rotationY: ry,
+      transformPerspective: 900,
+      duration: 0.45, ease: 'power2.out',
+    });
+  });
+
+  slip.addEventListener('mouseleave', () => {
+    gsap.to(slip, {
+      rotationX: 0, rotationY: 0,
+      transformPerspective: 900,
+      duration: 1.0, ease: 'elastic.out(1, 0.35)',
+    });
+  });
+}
+
+/* ── Nav ────────────────────────────────────────────────────── */
 function initNav() {
   const nav    = document.getElementById('site-nav');
   const burger = document.getElementById('navBurger');
@@ -187,6 +240,7 @@ function initNav() {
     const open = links.classList.toggle('open');
     burger.setAttribute('aria-expanded', String(open));
     document.body.style.overflow = open ? 'hidden' : '';
+    if (lenis) open ? lenis.stop() : lenis.start();
   });
 
   links?.querySelectorAll('.nav-link').forEach(a => {
@@ -194,11 +248,12 @@ function initNav() {
       links.classList.remove('open');
       burger?.setAttribute('aria-expanded', 'false');
       document.body.style.overflow = '';
+      if (lenis) lenis.start();
     });
   });
 }
 
-/* ── Generic [data-reveal] scroll handler ───────────────────── */
+/* ── Generic [data-reveal] handler ─────────────────────────── */
 function initReveal() {
   if (prefersReduced) {
     gsap.set('[data-reveal]', { opacity: 1, x: 0, y: 0 });
@@ -212,9 +267,7 @@ function initReveal() {
 
     gsap.to(el, {
       opacity: 1, x: 0, y: 0,
-      duration: 0.7,
-      ease: 'power3.out',
-      delay,
+      duration: 0.7, ease: 'power3.out', delay,
       scrollTrigger: { trigger: el, start: 'top 84%', once: true }
     });
   });
@@ -224,23 +277,50 @@ function initReveal() {
 function initScrollAnimations() {
   if (prefersReduced) return;
 
-  // ── Manifesto text reveal ──
-  const mP1 = document.getElementById('manifestoP1');
-  const mP2 = document.getElementById('manifestoP2');
-  if (mP1) {
-    gsap.to(mP1, {
-      clipPath: 'inset(0 0% 0 0)',
-      duration: 1.2,
-      ease: 'power3.out',
-      scrollTrigger: { trigger: mP1, start: 'top 78%' }
+  // ── Scroll progress bar ──
+  const progressBar = document.querySelector('.scroll-progress');
+  if (progressBar) {
+    ScrollTrigger.create({
+      start: 0, end: 'max',
+      onUpdate: self => { progressBar.style.width = (self.progress * 100) + '%'; }
     });
   }
-  if (mP2) {
-    gsap.to(mP2, {
+
+  // ── Section heading wipe-reveals ──
+  ['.hiw-heading', '.branches-heading', '.oa-heading', '.art-top h2', '.ledger-top h2'].forEach(sel => {
+    const el = document.querySelector(sel);
+    if (!el) return;
+    gsap.set(el, { clipPath: 'inset(0 100% 0 0)' });
+    gsap.to(el, {
       clipPath: 'inset(0 0% 0 0)',
-      duration: 1.2,
-      ease: 'power3.out',
-      scrollTrigger: { trigger: mP2, start: 'top 82%' }
+      duration: 1.1, ease: 'power3.out',
+      scrollTrigger: { trigger: el, start: 'top 82%', once: true }
+    });
+  });
+
+  // ── Manifesto text reveal ──
+  ['manifestoP1', 'manifestoP2'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    gsap.to(el, {
+      clipPath: 'inset(0 0% 0 0)',
+      duration: 1.2, ease: 'power3.out',
+      scrollTrigger: { trigger: el, start: `top ${78 + i * 4}%` }
+    });
+  });
+
+  // ── Manifesto watermark parallax ──
+  const watermark = document.querySelector('.manifesto-watermark');
+  if (watermark) {
+    gsap.to(watermark, {
+      yPercent: -18,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.manifesto',
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: true,
+      }
     });
   }
 
@@ -274,13 +354,12 @@ function initScrollAnimations() {
     });
   }
 
-  // ── Metaphor transforms — GSAP timeline, no setTimeout ──
+  // ── Metaphor transforms — GSAP timeline ──
   const metaRows = document.querySelectorAll('[data-meta]');
   if (metaRows.length) {
     ScrollTrigger.create({
       trigger: metaRows[0].closest('.meta-rows') || metaRows[0],
-      start: 'top 82%',
-      once: true,
+      start: 'top 82%', once: true,
       onEnter: () => {
         const tl = gsap.timeline();
         metaRows.forEach((row, i) => {
@@ -304,37 +383,56 @@ function initScrollAnimations() {
   }
 }
 
-/* ── Form submission + passbook state ───────────────────────── */
+/* ── Form — submit + live name ──────────────────────────────── */
 function initForm() {
-  const form    = document.getElementById('oaForm');
-  const success = document.getElementById('oaSuccess');
-  const stamp   = document.getElementById('successStamp');
-  const nameEl  = document.getElementById('successName');
+  const form      = document.getElementById('oaForm');
+  const success   = document.getElementById('oaSuccess');
+  const stamp     = document.getElementById('successStamp');
+  const nameEl    = document.getElementById('successName');
+  const nameInput = document.getElementById('oa-name');
+  const submitBtn = form?.querySelector('.oa-submit');
   if (!form) return;
 
-  form.addEventListener('submit', e => {
-    e.preventDefault();
+  // Live name → button copy
+  const defaultBtn = 'Open My Account';
+  nameInput?.addEventListener('input', () => {
+    const first = nameInput.value.trim().split(/\s+/)[0];
+    if (submitBtn) submitBtn.textContent = first ? `Open ${first}'s Account` : defaultBtn;
+  });
 
-    const nameVal = (document.getElementById('oa-name')?.value || '').trim();
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const nameVal = (nameInput?.value || '').trim();
     if (nameEl) nameEl.textContent = nameVal || '—';
 
-    // Set initial states before revealing so there's no flash
+    // Submit to Formspree if action is configured
+    const endpoint = form.action;
+    if (endpoint && !endpoint.includes('YOUR_FORM_ID')) {
+      try {
+        await fetch(endpoint, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { 'Accept': 'application/json' }
+        });
+      } catch (_) { /* show success state regardless */ }
+    }
+
     const passCard = success.querySelector('.passbook-card');
     gsap.set(passCard, { opacity: 0, y: 20 });
-    gsap.set('.success-msg', { opacity: 0, y: 16 });
+    gsap.set('.success-msg', { opacity: 0, y: 12 });
     if (stamp) gsap.set(stamp, { scale: 2.8, rotation: -28, opacity: 0 });
 
     form.style.display = 'none';
     success.hidden = false;
 
-    gsap.to(passCard, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', delay: 0.1 });
+    gsap.to(passCard,      { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', delay: 0.1 });
     if (stamp) {
       gsap.to(stamp, {
-        scale: 1, rotation: -12, opacity: 1, duration: 0.55, ease: 'back.out(2.2)', delay: 0.4,
+        scale: 1, rotation: -12, opacity: 1, duration: 0.55, ease: 'back.out(2.2)', delay: 0.45,
         onComplete: () => gsap.to(stamp, { opacity: 0.88, duration: 0.4 })
       });
     }
-    gsap.to('.success-msg', { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out', delay: 0.55 });
+    gsap.to('.success-msg', { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out', delay: 0.6 });
   });
 }
 
@@ -349,9 +447,11 @@ function initScrollHint() {
 
 /* ── Boot ───────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
+  initLenis();
   initPreloader();
   initCursor();
   initMagnets();
+  initTilt();
   initNav();
   initReveal();
   initScrollAnimations();
