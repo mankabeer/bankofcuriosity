@@ -6,7 +6,7 @@
 gsap.registerPlugin(ScrollTrigger);
 
 /* ── Globals ────────────────────────────────────────────────── */
-const isMobile = window.matchMedia('(max-width: 680px)').matches;
+const isMobile      = window.matchMedia('(max-width: 680px)').matches;
 const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ── Ticker duplication (double content for seamless -50% loop) */
@@ -19,9 +19,9 @@ const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').mat
 /* ── Canvas — animated ledger lines ────────────────────────── */
 function initCanvas() {
   const canvas = document.getElementById('hero-canvas');
-  if (!canvas) return;
+  if (!canvas || isMobile) return;
   const ctx = canvas.getContext('2d');
-  let W, H, lines = [], raf;
+  let W, H, lines = [], raf, lastTime = 0;
 
   function resize() {
     W = canvas.width  = canvas.offsetWidth;
@@ -33,19 +33,22 @@ function initCanvas() {
     const spacing = 26;
     const count   = Math.ceil(H / spacing) + 2;
     lines = Array.from({ length: count }, (_, i) => ({
-      baseY:     i * spacing,
-      phase:     Math.random() * Math.PI * 2,
-      amp:       2 + Math.random() * 5,
-      freq:      0.0025 + Math.random() * 0.003,
-      speed:     0.00018 + Math.random() * 0.00014,
-      opacity:   0.04 + Math.random() * 0.06,
+      baseY:   i * spacing,
+      phase:   Math.random() * Math.PI * 2,
+      amp:     2 + Math.random() * 5,
+      freq:    0.0025 + Math.random() * 0.003,
+      speed:   0.00018 + Math.random() * 0.00014,
+      opacity: 0.04 + Math.random() * 0.06,
     }));
   }
 
   let t = 0;
-  function draw() {
+  function draw(now) {
+    const deltaTime = lastTime ? (now - lastTime) / 1000 : 0;
+    lastTime = now;
+    t += deltaTime * 6000;
+
     ctx.clearRect(0, 0, W, H);
-    t += 10;
     lines.forEach(l => {
       ctx.beginPath();
       ctx.strokeStyle = `rgba(240,232,213,${l.opacity})`;
@@ -61,15 +64,14 @@ function initCanvas() {
 
   resize();
   window.addEventListener('resize', resize);
-  if (!prefersReduced) draw();
-  else ctx.clearRect(0, 0, W, H);
+  if (!prefersReduced) raf = requestAnimationFrame(draw);
 }
 
 /* ── Preloader ──────────────────────────────────────────────── */
 function initPreloader() {
-  const loader   = document.getElementById('preloader');
-  const bar      = document.getElementById('preBar');
-  const status   = document.getElementById('preStatus');
+  const loader  = document.getElementById('preloader');
+  const bar     = document.getElementById('preBar');
+  const status  = document.getElementById('preStatus');
   if (!loader) return;
 
   initCanvas();
@@ -89,26 +91,27 @@ function initPreloader() {
     }
   });
 
-  tl.to(bar,    { width: '35%', duration: 0.45, ease: 'power2.out' })
+  tl.to(bar,   { width: '35%', duration: 0.45, ease: 'power2.out' })
     .call(() => { status.textContent = msgs[1]; })
-    .to(bar,    { width: '72%', duration: 0.5,  ease: 'power2.out' })
+    .to(bar,   { width: '72%', duration: 0.5,  ease: 'power2.out' })
     .call(() => { status.textContent = msgs[2]; })
-    .to(bar,    { width: '100%', duration: 0.3, ease: 'power2.out' });
+    .to(bar,   { width: '100%', duration: 0.3, ease: 'power2.out' });
 }
 
 /* ── Hero entrance ──────────────────────────────────────────── */
 function initHeroEntrance() {
+  if (prefersReduced) return;
   const eyebrow = document.getElementById('heroEyebrow');
   const lines   = document.querySelectorAll('.hero-headline .hl');
   const foot    = document.getElementById('heroFoot');
 
-  gsap.set(lines,   { y: '108%' });
+  gsap.set(lines, { y: '108%' });
   gsap.set([eyebrow, foot], { opacity: 0, y: 18 });
 
   const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
   tl.to(eyebrow, { opacity: 1, y: 0, duration: 0.7 })
     .to(lines,   { y: '0%', duration: 1.0, stagger: 0.08 }, '-=0.45')
-    .to(foot,    { opacity: 1, y: 0, duration: 0.7 },        '-=0.55');
+    .to(foot,    { opacity: 1, y: 0, duration: 0.7 },       '-=0.55');
 }
 
 /* ── Custom cursor ──────────────────────────────────────────── */
@@ -132,23 +135,20 @@ function initCursor() {
     gsap.set(ring, { x: rx, y: ry });
   });
 
-  // Hover states
   document.querySelectorAll('a, button, [data-magnet], input, select').forEach(el => {
     el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
     el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
   });
 
-  // Theme switching (light sections → dark cursor)
-  const lightSections = document.querySelectorAll('[data-section-theme="light"]');
-  lightSections.forEach(s => {
+  document.querySelectorAll('[data-section-theme="light"]').forEach(s => {
     ScrollTrigger.create({
       trigger: s,
       start: 'top 10%',
       end: 'bottom 10%',
-      onEnter:      () => document.body.classList.add('cursor-light'),
-      onLeave:      () => document.body.classList.remove('cursor-light'),
-      onEnterBack:  () => document.body.classList.add('cursor-light'),
-      onLeaveBack:  () => document.body.classList.remove('cursor-light'),
+      onEnter:     () => document.body.classList.add('cursor-light'),
+      onLeave:     () => document.body.classList.remove('cursor-light'),
+      onEnterBack: () => document.body.classList.add('cursor-light'),
+      onLeaveBack: () => document.body.classList.remove('cursor-light'),
     });
   });
 }
@@ -179,8 +179,8 @@ function initNav() {
 
   ScrollTrigger.create({
     start: '80px top',
-    onEnter:    () => nav.classList.add('scrolled'),
-    onLeaveBack:() => nav.classList.remove('scrolled'),
+    onEnter:     () => nav.classList.add('scrolled'),
+    onLeaveBack: () => nav.classList.remove('scrolled'),
   });
 
   burger?.addEventListener('click', () => {
@@ -198,10 +198,33 @@ function initNav() {
   });
 }
 
+/* ── Generic [data-reveal] scroll handler ───────────────────── */
+function initReveal() {
+  if (prefersReduced) {
+    gsap.set('[data-reveal]', { opacity: 1, x: 0, y: 0 });
+    return;
+  }
+  document.querySelectorAll('[data-reveal]').forEach(el => {
+    const dir   = el.dataset.reveal;
+    const delay = parseFloat(el.dataset.revealDelay || 0);
+    const fromX = dir === 'left' ? -20 : dir === 'right' ? 20 : 0;
+    const fromY = (!dir || dir === '') ? 24 : 0;
+
+    gsap.to(el, {
+      opacity: 1, x: 0, y: 0,
+      duration: 0.7,
+      ease: 'power3.out',
+      delay,
+      scrollTrigger: { trigger: el, start: 'top 84%', once: true }
+    });
+  });
+}
+
 /* ── Scroll animations ──────────────────────────────────────── */
 function initScrollAnimations() {
+  if (prefersReduced) return;
 
-  // ── Manifesto text reveal (clip-path) ──
+  // ── Manifesto text reveal ──
   const mP1 = document.getElementById('manifestoP1');
   const mP2 = document.getElementById('manifestoP2');
   if (mP1) {
@@ -221,41 +244,10 @@ function initScrollAnimations() {
     });
   }
 
-  // ── "90 minutes" counter ──
-  const numEl = document.getElementById('ninetyNum');
-  if (numEl) {
-    ScrollTrigger.create({
-      trigger: numEl,
-      start: 'top 80%',
-      once: true,
-      onEnter: () => {
-        gsap.to({ val: 0 }, {
-          val: 90,
-          duration: 1.6,
-          ease: 'power2.out',
-          onUpdate: function() { numEl.textContent = Math.round(this.targets()[0].val); }
-        });
-        gsap.from(numEl, {
-          opacity: 0, y: 30, duration: 0.8, ease: 'power3.out'
-        });
-      }
-    });
-  }
-
-  // ── HOW IT WORKS items ──
-  document.querySelectorAll('.hiw-item').forEach((el, i) => {
-    gsap.to(el, {
-      opacity: 1, y: 0, duration: 0.75, ease: 'power3.out',
-      scrollTrigger: { trigger: el, start: 'top 80%' },
-      delay: i * 0.12
-    });
-  });
-
-  // ── Deposit slip (CSS sets initial opacity:0 y:60px rotate:0.5deg) ──
+  // ── Deposit slip ──
   const slip    = document.getElementById('depositSlip');
   const stampEl = document.getElementById('depositStamp');
   if (slip) {
-    // GSAP overrides the CSS initial values and animates to final state
     gsap.set(slip, { opacity: 0, y: 60, rotation: 0.5 });
     gsap.to(slip, {
       opacity: 1, y: 0, rotation: 0, duration: 1.0, ease: 'power4.out',
@@ -273,15 +265,6 @@ function initScrollAnimations() {
     }
   }
 
-  // ── Topic rows ──
-  document.querySelectorAll('.topic-row').forEach((el, i) => {
-    gsap.to(el, {
-      opacity: 1, x: 0, duration: 0.5, ease: 'power3.out',
-      scrollTrigger: { trigger: el, start: 'top 85%' },
-      delay: i * 0.07
-    });
-  });
-
   // ── Metaphor blockquote ──
   const pull = document.getElementById('metaphorPull');
   if (pull) {
@@ -291,82 +274,67 @@ function initScrollAnimations() {
     });
   }
 
-  // ── Metaphor transforms (strikethrough + reveal) ──
-  document.querySelectorAll('[data-meta]').forEach((row, i) => {
+  // ── Metaphor transforms — GSAP timeline, no setTimeout ──
+  const metaRows = document.querySelectorAll('[data-meta]');
+  if (metaRows.length) {
     ScrollTrigger.create({
-      trigger: row,
+      trigger: metaRows[0].closest('.meta-rows') || metaRows[0],
       start: 'top 82%',
       once: true,
       onEnter: () => {
-        const before = row.querySelector('.meta-before');
-        setTimeout(() => {
-          before?.classList.add('struck');
-          row.classList.add('active');
-        }, i * 90);
+        const tl = gsap.timeline();
+        metaRows.forEach((row, i) => {
+          tl.add(() => {
+            row.querySelector('.meta-before')?.classList.add('struck');
+            row.classList.add('active');
+          }, i * 0.09);
+        });
       }
     });
-  });
-
-  // ── Artefact cards ──
-  document.querySelectorAll('.art-card').forEach((el, i) => {
-    gsap.to(el, {
-      opacity: 1, y: 0, duration: 0.6, ease: 'power3.out',
-      scrollTrigger: { trigger: el, start: 'top 85%' },
-      delay: (i % 3) * 0.1
-    });
-  });
-
-  // ── Branch examples ──
-  document.querySelectorAll('.branch-eg').forEach((el, i) => {
-    gsap.to(el, {
-      opacity: 1, x: 0, duration: 0.55, ease: 'power3.out',
-      scrollTrigger: { trigger: el, start: 'top 85%' },
-      delay: i * 0.1
-    });
-  });
+  }
 
   // ── Members heading lines ──
   const mhLines = document.querySelectorAll('.mh-line');
-  gsap.from(mhLines, {
-    y: '110%', duration: 0.9, stagger: 0.1, ease: 'power4.out',
-    scrollTrigger: { trigger: '#membersHeading', start: 'top 80%' }
-  });
-
-  // ── Contact columns ──
-  document.querySelectorAll('.contact-col').forEach((el, i) => {
-    gsap.from(el, {
-      opacity: 0, y: 25, duration: 0.7, ease: 'power3.out',
-      scrollTrigger: { trigger: el, start: 'top 80%' },
-      delay: i * 0.15
+  if (mhLines.length) {
+    gsap.set(mhLines, { y: '110%' });
+    gsap.to(mhLines, {
+      y: '0%', duration: 0.9, stagger: 0.1, ease: 'power4.out',
+      scrollTrigger: { trigger: '#membersHeading', start: 'top 80%' }
     });
-  });
+  }
 }
 
-/* ── Form submission + stamp slam ───────────────────────────── */
+/* ── Form submission + passbook state ───────────────────────── */
 function initForm() {
   const form    = document.getElementById('oaForm');
   const success = document.getElementById('oaSuccess');
   const stamp   = document.getElementById('successStamp');
+  const nameEl  = document.getElementById('successName');
   if (!form) return;
 
   form.addEventListener('submit', e => {
     e.preventDefault();
+
+    const nameVal = (document.getElementById('oa-name')?.value || '').trim();
+    if (nameEl) nameEl.textContent = nameVal || '—';
+
+    // Set initial states before revealing so there's no flash
+    const passCard = success.querySelector('.passbook-card');
+    gsap.set(passCard, { opacity: 0, y: 20 });
+    gsap.set('.success-msg', { opacity: 0, y: 16 });
+    if (stamp) gsap.set(stamp, { scale: 2.8, rotation: -28, opacity: 0 });
+
     form.style.display = 'none';
     success.hidden = false;
 
+    gsap.to(passCard, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', delay: 0.1 });
     if (stamp) {
-      gsap.fromTo(stamp,
-        { scale: 2.8, rotation: -28, opacity: 0 },
-        { scale: 1, rotation: -8, opacity: 1, duration: 0.55, ease: 'back.out(2.2)',
-          onComplete: () => {
-            gsap.to(stamp, { opacity: 0.88, duration: 0.4 });
-          }
-        }
-      );
+      gsap.to(stamp, {
+        scale: 1, rotation: -12, opacity: 1, duration: 0.55, ease: 'back.out(2.2)', delay: 0.4,
+        onComplete: () => gsap.to(stamp, { opacity: 0.88, duration: 0.4 })
+      });
     }
-    gsap.from('.success-msg', {
-      opacity: 0, y: 16, duration: 0.6, ease: 'power3.out', delay: 0.4
-    });
+    gsap.to('.success-msg', { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out', delay: 0.55 });
   });
 }
 
@@ -374,7 +342,7 @@ function initForm() {
 function initScrollHint() {
   ScrollTrigger.create({
     start: '200px top',
-    onEnter: () => gsap.to('.hero-scroll-hint', { opacity: 0, duration: 0.4 }),
+    onEnter:     () => gsap.to('.hero-scroll-hint', { opacity: 0, duration: 0.4 }),
     onLeaveBack: () => gsap.to('.hero-scroll-hint', { opacity: 1, duration: 0.4 }),
   });
 }
@@ -385,6 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initCursor();
   initMagnets();
   initNav();
+  initReveal();
   initScrollAnimations();
   initForm();
   initScrollHint();
