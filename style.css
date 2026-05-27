@@ -644,7 +644,42 @@ body.is-loading { overflow: hidden; }
   line-height: 1.6;
 }
 
-/* ── 07 Branch Network ────────────────────────────────────── */
+/* ── 05 In the Wild (videos) ──────────────────────────────── */
+.ctable-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.5rem 2rem;
+}
+.ctable-card { display: flex; flex-direction: column; }
+.ctable-embed {
+  aspect-ratio: 16 / 9;
+  background: var(--dark);
+  border: 1px solid rgba(26,22,17,0.12);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.ctable-embed iframe { width: 100%; height: 100%; display: block; }
+.ctable-info {
+  padding: 0.9rem 0;
+  border-bottom: 1px solid rgba(26,22,17,0.08);
+  flex: 1;
+}
+.ctable-topic {
+  display: block;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.35rem;
+}
+.ctable-caption {
+  font-size: 0.8rem;
+  color: var(--ink-mid);
+  font-style: italic;
+  line-height: 1.55;
+}
+
+/* ── 08 Branch Network ────────────────────────────────────── */
 .section-lede {
   font-size: 0.92rem;
   color: var(--ink-mid);
@@ -678,20 +713,34 @@ body.is-loading { overflow: hidden; }
   height: 44px;
   min-width: 44px;
   border: 1px solid rgba(26,22,17,0.18);
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: border-color 0.2s;
+}
+.bnet-card:hover .bnet-mark { border-color: var(--gold); }
+.bnet-logo-img {
+  position: absolute;
+  inset: 5px;
+  width: calc(100% - 10px);
+  height: calc(100% - 10px);
+  object-fit: contain;
+  background: var(--cream);
+  transition: opacity 0.2s;
+}
+.bnet-initials {
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--mono);
-  font-size: 0.58rem;
+  font-size: 0.55rem;
   letter-spacing: 0.06em;
   color: var(--ink-mid);
-  flex-shrink: 0;
-  transition: border-color 0.2s, color 0.2s;
+  transition: color 0.2s;
 }
-.bnet-card:hover .bnet-mark {
-  border-color: var(--gold);
-  color: var(--gold);
-}
+.bnet-card:hover .bnet-initials { color: var(--gold); }
 .bnet-info {
   display: flex;
   flex-direction: column;
@@ -1099,6 +1148,8 @@ body.is-loading { overflow: hidden; }
   .ss-title { grid-column: 1; grid-row: 2; }
   .ss-venue { display: none; }
   .ss-arrow { grid-column: 2; grid-row: 1 / 3; align-self: center; }
+
+  .ctable-grid { grid-template-columns: 1fr; }
 
   .bnet-grid { grid-template-columns: 1fr; border-right: none; }
   .bnet-card { border-right: none; padding: 1.5rem 0; }
