@@ -58,7 +58,7 @@ function initHero() {
 
   tl.to('#heroEyebrow', { opacity: 1, duration: 0.6 })
     .to('.hl', { y: 0, duration: 1.1, stagger: 0.07, ease: 'expo.out' }, '-=0.3')
-    .to('.hero-clarify', { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, '-=0.5')
+    .to('.hero-clarify', { opacity: 0.55, y: 0, duration: 0.7, ease: 'power2.out' }, '-=0.5')
     .to('#heroFoot', { opacity: 1, duration: 0.7, ease: 'power2.out' }, '-=0.4');
 }
 
