@@ -50,12 +50,24 @@
       <span class="hl-wrap"><span class="hl">more carefully</span></span>
       <span class="hl-wrap"><span class="hl italic">than anyone told them.</span></span>
     </h1>
+    <p class="hero-clarify">People gather around an everyday object or system — and study, together, how it was designed.</p>
     <div class="hero-foot" id="heroFoot">
       <p class="hero-desc mono">Ninety minutes&nbsp;&nbsp;·&nbsp;&nbsp;One everyday object&nbsp;&nbsp;·&nbsp;&nbsp;One insider who designed it</p>
-      <a href="#open-account" class="hero-cta">Open an Account&nbsp;&nbsp;↗</a>
+      <a href="#" class="hero-cta js-open-account">Open an Account&nbsp;&nbsp;↗</a>
     </div>
   </div>
 </section>
+
+<div class="site-clarifier">
+  <div class="clarifier-inner mono">
+    <span class="clarifier-label">Recent subjects</span>
+    <div class="clarifier-examples">
+      <span>Why telecom plans push one option over another</span>
+      <span>How supermarket shelves are rented, not arranged</span>
+      <span>How medicine strip packaging assumes behaviour</span>
+    </div>
+  </div>
+</div>
 
 <div class="session-strip" aria-label="Upcoming sessions">
   <div class="ss-head mono">Upcoming Sessions</div>
@@ -619,6 +631,7 @@
       <span class="section-label mono">For Branches</span>
     </div>
     <div class="section-body">
+      <p class="section-lede">Branches are places where the Bank temporarily operates — partner institutions that open a door into how they work, once a month.</p>
       <h2 class="section-display" id="branchesHeading">Become a branch.</h2>
       <div class="branches-layout">
         <div class="branches-text">
@@ -664,7 +677,7 @@
       <div class="members-body">
         <p>A calendar of sessions across branches. A passbook that records each deposit. Periodic statements of what you have attended and what is next.</p>
         <p>What compounds is not points. It is what sustained curiosity produces: an instinct for asking sharper questions.</p>
-        <a href="#open-account" class="text-link">Open an Account&nbsp;&nbsp;→</a>
+        <a href="#" class="text-link js-open-account">Open an Account&nbsp;&nbsp;→</a>
       </div>
     </div>
   </div>
@@ -679,76 +692,55 @@
     <div class="section-body">
       <h2 class="section-display" id="oaHeading">Open your<br>account.</h2>
       <p class="oa-sub">Your balance starts at zero. The first deposit is attendance.</p>
-      <div class="oa-card">
-        <div class="oa-card-head mono">Account Opening Form</div>
-        <form class="oa-form" id="oaForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
-          <div class="oa-field">
-            <label for="oa-name" class="mono">Full Name</label>
-            <input type="text" id="oa-name" name="name" placeholder="Your full name" required />
+
+      <div class="specimen-passbook" aria-hidden="true">
+        <div class="spec-watermark mono">SPECIMEN</div>
+        <div class="spec-header">
+          <div>
+            <span class="spec-bank">Bank of Curiosity</span>
+            <span class="spec-doc mono">Member Passbook · Savings Account</span>
           </div>
-          <div class="oa-field">
-            <label for="oa-email" class="mono">Email Address</label>
-            <input type="email" id="oa-email" name="email" placeholder="For account statements" required />
+          <span class="spec-branch mono">Pune Branch</span>
+        </div>
+        <div class="spec-body">
+          <div class="spec-row">
+            <span class="spec-k mono">Account Holder</span>
+            <span class="spec-v spec-blank"></span>
           </div>
-          <div class="oa-row">
-            <div class="oa-field">
-              <label for="oa-city" class="mono">City</label>
-              <input type="text" id="oa-city" name="city" placeholder="Your city" />
-            </div>
-            <div class="oa-field">
-              <label for="oa-interest" class="mono">Area of Interest</label>
-              <select id="oa-interest" name="interest">
-                <option value="">Select one</option>
-                <option>Design &amp; Product</option>
-                <option>Food &amp; Hospitality</option>
-                <option>Finance &amp; Economics</option>
-                <option>Technology</option>
-                <option>Urban Systems</option>
-                <option>Medicine &amp; Health</option>
-                <option>All of the above</option>
-              </select>
-            </div>
+          <div class="spec-row">
+            <span class="spec-k mono">Account Number</span>
+            <span class="spec-v spec-blank-dashed mono">BOC — — — —</span>
           </div>
-          <button type="submit" class="oa-submit" id="oaSubmit">Open My Account</button>
-          <p class="oa-fine mono">No spam. Only sessions and statements.</p>
-        </form>
-        <div class="oa-success" id="oaSuccess" hidden>
-          <div class="passbook-card">
-            <div class="passbook-head">
-              <div class="passbook-bank">Bank of Curiosity</div>
-              <div class="passbook-doc mono">Member Passbook</div>
-            </div>
-            <div class="passbook-body">
-              <div class="passbook-field">
-                <span class="passbook-label mono">Account Holder</span>
-                <span class="passbook-value" id="successName">—</span>
-              </div>
-              <div class="passbook-field">
-                <span class="passbook-label mono">Account Type</span>
-                <span class="passbook-value">General Savings</span>
-              </div>
-              <div class="passbook-field">
-                <span class="passbook-label mono">Branch Access</span>
-                <span class="passbook-value">All Branches</span>
-              </div>
-              <div class="passbook-field">
-                <span class="passbook-label mono">Current Balance</span>
-                <span class="passbook-value passbook-italic">Zero. Curiosity accruing.</span>
-              </div>
-              <div class="passbook-stamp-row">
-                <div class="stamp stamp-success" id="successStamp">
-                  <div class="stamp-body">
-                    <span class="mono">Bank of Curiosity</span>
-                    <div class="stamp-rule-line"></div>
-                    <span class="mono">Account Opened</span>
-                  </div>
-                </div>
-              </div>
+          <div class="spec-row">
+            <span class="spec-k mono">Date of Opening</span>
+            <span class="spec-v spec-blank"></span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-k mono">Account Type</span>
+            <span class="spec-v">Savings Account</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-k mono">Opening Balance</span>
+            <span class="spec-v">0 Curiosities</span>
+          </div>
+        </div>
+        <div class="spec-footer">
+          <div class="stamp spec-stamp">
+            <div class="stamp-body">
+              <span class="mono">Bank of</span>
+              <div class="stamp-rule-line"></div>
+              <span class="mono">Curiosity</span>
             </div>
           </div>
-          <p class="success-msg">Your first statement will arrive shortly.</p>
+          <div class="spec-note mono">
+            <span>No fee. No minimum balance.</span>
+            <span>Attendance is the deposit.</span>
+          </div>
         </div>
       </div>
+
+      <button class="oa-submit js-open-account" type="button">Open My Account</button>
+      <p class="oa-fine mono">No spam. Account statements and session notices only.</p>
     </div>
   </div>
 </section>
@@ -783,6 +775,158 @@
     <span class="footer-meta mono">Est. 2026&nbsp;&nbsp;·&nbsp;&nbsp;Pune&nbsp;&nbsp;·&nbsp;&nbsp;A Preposition Studio institution</span>
   </div>
 </footer>
+
+<!-- ── Account Opening Overlay ─────────────────────────── -->
+<div id="accountOverlay" class="ao-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="aoDocTitle">
+  <div class="ao-doc">
+
+    <!-- Phase: Form -->
+    <div class="ao-phase" id="aoPhaseForm">
+      <div class="ao-doc-header">
+        <div class="ao-header-left">
+          <span class="ao-institution mono">Bank of Curiosity &mdash; Est.&thinsp;2026 &middot; Pune</span>
+          <h2 class="ao-doc-title" id="aoDocTitle">Account Opening<br>Request</h2>
+          <span class="ao-doc-sub mono">Form BOC-001 &middot; General Savings Account</span>
+        </div>
+        <div class="ao-header-right">
+          <div class="ao-doc-meta mono">
+            <span>Ref:&ensp;<span id="aoRefNum">—</span></span>
+            <span>Date:&ensp;<span id="aoDocDate">—</span></span>
+          </div>
+          <button class="ao-close" id="aoClose" aria-label="Close">&#x2715;</button>
+        </div>
+      </div>
+
+      <form class="ao-form" id="aoForm" novalidate>
+        <fieldset class="ao-fieldset">
+          <legend class="ao-legend mono">Section A &mdash; Applicant Details</legend>
+
+          <div class="ao-field ao-field-full">
+            <label class="ao-label mono" for="ao-name">Full Name <span class="ao-req">(as it should appear on passbook)</span></label>
+            <input type="text" class="ao-input" id="ao-name" name="name" required autocomplete="name" />
+          </div>
+
+          <div class="ao-field-row">
+            <div class="ao-field">
+              <label class="ao-label mono" for="ao-city">City</label>
+              <input type="text" class="ao-input" id="ao-city" name="city" autocomplete="address-level2" />
+            </div>
+            <div class="ao-field">
+              <label class="ao-label mono" for="ao-occupation">Occupation</label>
+              <input type="text" class="ao-input" id="ao-occupation" name="occupation" />
+            </div>
+          </div>
+
+          <div class="ao-field ao-field-full">
+            <label class="ao-label mono" for="ao-email">Email Address <span class="ao-req">(for statements and session notices)</span></label>
+            <input type="email" class="ao-input" id="ao-email" name="email" required autocomplete="email" />
+          </div>
+        </fieldset>
+
+        <fieldset class="ao-fieldset">
+          <legend class="ao-legend mono">Section B &mdash; Initial Declaration</legend>
+
+          <div class="ao-field ao-field-full">
+            <label class="ao-label mono" for="ao-curiosity">What have you been curious about lately? &mdash; or &mdash; What ordinary thing have you looked at twice recently? <span class="ao-req">(Optional, but encouraged.)</span></label>
+            <textarea class="ao-input ao-textarea" id="ao-curiosity" name="curiosity" rows="3"></textarea>
+          </div>
+        </fieldset>
+
+        <div class="ao-form-footer">
+          <p class="ao-declaration mono">I hereby apply for a Savings Account at the Bank of Curiosity. I understand that my opening balance will be zero, and that deposits are made through attendance.</p>
+          <button type="submit" class="ao-submit-btn mono" id="aoSubmit">Submit Application</button>
+          <span class="ao-fine-text mono">No spam. Account statements and session notices only.</span>
+        </div>
+      </form>
+    </div>
+
+    <!-- Phase: Processing -->
+    <div class="ao-phase" id="aoPhaseProcessing" hidden>
+      <div class="ao-processing-wrap">
+        <div class="ao-steps">
+          <div class="ao-step" id="aoStep1">
+            <span class="ao-step-dot"></span>
+            <span class="ao-step-text mono">Submitting application</span>
+          </div>
+          <div class="ao-step" id="aoStep2">
+            <span class="ao-step-dot"></span>
+            <span class="ao-step-text mono">Reviewing details</span>
+          </div>
+          <div class="ao-step" id="aoStep3">
+            <span class="ao-step-dot"></span>
+            <span class="ao-step-text mono">Generating account number</span>
+          </div>
+          <div class="ao-step" id="aoStep4">
+            <span class="ao-step-dot"></span>
+            <span class="ao-step-text mono">Opening account</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase: Success -->
+    <div class="ao-phase" id="aoPhaseSuccess" hidden>
+      <div class="ao-success-wrap">
+        <div class="ao-approved-band">
+          <span class="ao-approved-label mono">Account Approved</span>
+        </div>
+
+        <div class="ao-passbook" id="aoPassbook">
+          <div class="ao-pb-head">
+            <div>
+              <span class="ao-pb-institution">Bank of Curiosity</span>
+              <span class="ao-pb-doc mono">Member Passbook</span>
+            </div>
+            <div class="stamp" id="aoStamp">
+              <div class="stamp-body">
+                <span class="mono">Bank of</span>
+                <div class="stamp-rule-line"></div>
+                <span class="mono">Curiosity</span>
+              </div>
+            </div>
+          </div>
+          <div class="ao-pb-fields">
+            <div class="ao-pb-row">
+              <span class="ao-pb-k mono">Account Holder</span>
+              <span class="ao-pb-v" id="aoSuccessName">—</span>
+            </div>
+            <div class="ao-pb-row">
+              <span class="ao-pb-k mono">Account Number</span>
+              <span class="ao-pb-v mono" id="aoAccountNum">BOC-0000</span>
+            </div>
+            <div class="ao-pb-row">
+              <span class="ao-pb-k mono">Branch</span>
+              <span class="ao-pb-v" id="aoSuccessBranch">Pune</span>
+            </div>
+            <div class="ao-pb-row">
+              <span class="ao-pb-k mono">Account Type</span>
+              <span class="ao-pb-v">Savings Account</span>
+            </div>
+            <div class="ao-pb-row">
+              <span class="ao-pb-k mono">Status</span>
+              <span class="ao-pb-v">Active</span>
+            </div>
+            <div class="ao-pb-row">
+              <span class="ao-pb-k mono">Opening Balance</span>
+              <span class="ao-pb-v">0 Curiosities</span>
+            </div>
+            <div class="ao-pb-row">
+              <span class="ao-pb-k mono">Date Opened</span>
+              <span class="ao-pb-v mono" id="aoSuccessDate">—</span>
+            </div>
+          </div>
+          <div class="ao-pb-foot mono">
+            <span>Your first deposit awaits.</span>
+          </div>
+        </div>
+
+        <p class="ao-welcome-msg">Welcome to the Bank of Curiosity.</p>
+        <button class="ao-return-btn mono" id="aoCloseSuccess">Return to Institution &nbsp;→</button>
+      </div>
+    </div>
+
+  </div>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
